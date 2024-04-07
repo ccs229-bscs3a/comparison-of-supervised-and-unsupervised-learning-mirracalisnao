@@ -14,7 +14,7 @@ import time
 # Define the Streamlit app
 def app():
 
-    st.subheader('Supervised Learning, Classification, and KNN with Iris Dataset')
+    st.subheader('Supervised Learning, Classification, and KNN with Penguins Dataset')
     text = """**Supervised Learning:**
     \nSupervised learning is a branch of machine learning where algorithms learn from labeled data. 
     This data consists of input features (X) and corresponding outputs or labels (y). The algorithm learns a 
@@ -26,25 +26,25 @@ def app():
     point based on its features.
     \n**K-Nearest Neighbors (KNN):**
     KNN is a simple yet powerful algorithm for both classification and regression tasks. 
-    \n**The Iris Dataset:**
-    The Iris dataset is a popular benchmark dataset in machine learning. It contains information about 150 
-    iris flowers from three different species: Iris Setosa, Iris Versicolor, and Iris Virginica. 
-    Each flower is described by four features:
-    * Sepal length (cm)
-    * Sepal width (cm)
-    * Petal length (cm)
-    * Petal width (cm)
-    \n**KNN Classification with Iris:**
+    \n**The Penguins Dataset:**
+    The Penguins dataset contains information about penguin species including Adelie, Chinstrap, and Gentoo. 
+    Each penguin is described by several features:
+    * Culmen Length (mm)
+    * Culmen Depth (mm)
+    * Flipper Length (mm)
+    * Body Mass (g)
+    * Species
+    \n**KNN Classification with Penguins:**
     \n1. **Training:**
-    * The KNN algorithm stores the entire Iris dataset (features and labels) as its training data.
+    * The KNN algorithm stores the entire Penguins dataset (features and labels) as its training data.
     \n2. **Prediction:**
-    * When presented with a new iris flower (unknown species), KNN calculates the distance (often Euclidean distance) 
-    between this flower's features and all the flowers in the training data.
+    * When presented with a new penguin (unknown species), KNN calculates the distance (often Euclidean distance) 
+    between this penguin's features and all the penguins in the training data.
     * The user defines the value of 'k' (number of nearest neighbors). KNN identifies the 'k' closest 
-    data points (flowers) in the training set to the new flower.
-    * KNN predicts the class label (species) for the new flower based on the majority vote among its 
-    'k' nearest neighbors. For example, if three out of the five nearest neighbors belong to Iris Setosa, 
-    the new flower is classified as Iris Setosa.
+    data points (penguins) in the training set to the new penguin.
+    * KNN predicts the class label (species) for the new penguin based on the majority vote among its 
+    'k' nearest neighbors. For example, if three out of the five nearest neighbors belong to Adelie species, 
+    the new penguin is classified as Adelie.
     **Choosing 'k':**
     The value of 'k' significantly impacts KNN performance. A small 'k' value might lead to overfitting, where the 
     model performs well on the training data but poorly on unseen data. Conversely, a large 'k' value might not 
@@ -63,10 +63,15 @@ def app():
     )
 
     if st.button("Begin"):
-        # Load the Iris dataset
-        iris = datasets.load_iris()
-        X = iris.data  # Features
-        y = iris.target  # Target labels (species)
+        # Load the Penguins dataset
+        penguin = pd.read_csv('penguin.csv')
+        st.write(penguin.head())
+        st.write('Shape of the dataset:', penguin.shape)
+        st.write('Unique species:', penguin['Species'].unique())
+        
+        # Prepare the features (X) and target variable (y)
+        X = penguin[['Culmen Length (mm)', 'Culmen Depth (mm)', 'Flipper Length (mm)', 'Body Mass (g)']]
+        y = penguin['Species']
 
         # KNN for supervised classification (reference for comparison)
 
@@ -78,6 +83,8 @@ def app():
 
         # Predict the cluster labels for the data
         y_pred = knn.predict(X)
+        
+        st.subheader(' --- KNN Classification Results ---')
         st.write('Confusion Matrix')
         cm = confusion_matrix(y, y_pred)
         st.text(cm)
@@ -93,12 +100,13 @@ def app():
         for label, color in zip(unique_labels, colors):
             indices = y_pred == label
             # Use ax.scatter for consistent plotting on the created axis
-            ax.scatter(X[indices, 0], X[indices, 1], label=iris.target_names[label], c=color)
+            ax.scatter(X.loc[indices, 'Culmen Length (mm)'], X.loc[indices, 'Culmen Depth (mm)'], label=label, c=color)
 
         # Add labels and title using ax methods
-        ax.set_xlabel('Sepal length (cm)')
-        ax.set_ylabel('Sepal width (cm)')
-        ax.set_title('Sepal Length vs Width Colored by Predicted Iris Species')
+        ax.set_xlabel('Culmen length (mm)')
+        ax.set_ylabel('Culmen depth (mm)')
+        ax.set_title('Culmen length vs Culmen depth by Predicted Penguins Species')
+
 
         # Add legend and grid using ax methods
         ax.legend()
